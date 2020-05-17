@@ -24,6 +24,12 @@
     white-space: pre-wrap
   }
   
+  .searchInput{
+    width: 80%;
+    margin: 20px auto;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }
+  
 
   @media only screen and (min-width: 800px) {
     .cardList{
@@ -42,4 +48,11 @@
       hyphens: auto;
       white-space: pre-wrap
     }
+
+    .searchInput{
+      width: 50%;
+      margin: 20px auto;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+    
   }

@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import {Navbar,Nav,Button,Card, ButtonGroup} from 'react-bootstrap';
+import {Navbar,Nav,Button,Card, ButtonGroup, Form, FormControl} from 'react-bootstrap';
 import CreateModal from './createModal'
 import ShowModal from './ShowModal';
 import Swal from 'sweetalert2'
@@ -9,11 +9,13 @@ class App extends React.Component{
   state = {
     modalShow:false,
     notes:[],
+    notesToDisplay:[],
     modal2Show : false,
     modalType :'',
     id:'',
     title:'',
-    body:''
+    body:'',
+    searchString:''
   }
 
   submitNote = (data) =>{
@@ -68,7 +70,11 @@ class App extends React.Component{
       'Record is Updated',
       'success'
     )
-    }
+  }
+
+  searchItem = () => {
+
+  }
 
 
   render(){
@@ -78,6 +84,10 @@ class App extends React.Component{
         <Navbar.Brand href="#home">Keep Notes</Navbar.Brand>
         <Nav.Link onClick={() => this.setState({modalShow:true, modalType:''})} style={{color:'white',textDecoration:'none',position:'absolute',right:0,fontSize:'20px'}}><i className="fa fa-plus"></i></Nav.Link>
       </Navbar>
+
+      <Form className='searchInput'>
+        <FormControl type="text" value={this.state.searchString} onChange={(e) => this.setState({searchString:e.target.value})} placeholder="Filter by title..." className="mr-sm-2" />
+      </Form>
 
       <CreateModal
           className='modal-content'
@@ -98,7 +108,7 @@ class App extends React.Component{
 
       <div style={{width:'90%',margin:'auto'}}>
         <div className='cardList'>
-          {this.state.notes.map( (content)=>(
+          {this.state.notes.filter(note => note.title.includes(this.state.searchString)).map( content => (
             <Card key={content.id} style={{ marginTop:'20px',width: '18rem',boxShadow:'0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',borderRadius:'0.7rem'}}>
               <Card.Body>
                 <Card.Title style={{display:'flex',justifyContent:'space-between'}}>
