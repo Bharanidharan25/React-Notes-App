@@ -1,0 +1,45 @@
+.modal-content {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 1rem !important;
+  }
+  
+  .edit{
+    color:darkgray; 
+  }
+  
+  .edit:hover{
+    color:lightblue;
+  }
+  
+  .cardList {
+    padding: 15px;
+  }
+
+  .showModalSize{
+    height:15rem;
+    overflow-y: scroll;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+    white-space: pre-wrap
+  }
+  
+
+  @media only screen and (min-width: 800px) {
+    .cardList{
+      display: grid;
+      grid-template-columns: auto auto auto auto;
+      padding: 0.5rem;
+      grid-gap: 10px;
+
+    }
+
+    .showModalSize{
+      height:25rem;
+      overflow-y: scroll;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      hyphens: auto;
+      white-space: pre-wrap
+    }
+  }
