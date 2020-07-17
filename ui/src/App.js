@@ -1,7 +1,8 @@
 import React from 'react';
 import './App.css';
-import {Navbar,Nav,Button,Card, ButtonGroup, Form, FormControl} from 'react-bootstrap';
-import CreateModal from './createModal'
+import {Navbar,Nav,Button,Card, ButtonGroup} from 'react-bootstrap';
+import CreateModal from './createModal';
+import axios from 'axios';
 import ShowModal from './ShowModal';
 import Swal from 'sweetalert2'
 
@@ -18,17 +19,35 @@ class App extends React.Component{
     searchString:''
   }
 
+
+  componentDidMount(){
+    axios.get('http://localhost:3010/notes')
+      .then((Response)=>{
+        this.setState({notes:Response.data})
+      })
+  }
+
   submitNote = (data) =>{
-    this.setState(()=>{
-      const id = Math.floor(Math.random()*1000000)
-      const notes = [...this.state.notes, {id,title:data.title,body:data.body}]
-      return {notes}
+    axios.post('http://localhost:3010/notes',data)
+    .then((response)=>{
+      this.setState(()=>{
+        const notes = [...this.state.notes, response.data]
+        return {notes}
+      })
+      Swal.fire(
+        'Success',
+        'Record created successfully',
+        'success'
+      )
     })
-    Swal.fire(
-      'Success',
-      'Record created successfully',
-      'success'
-    )
+    .catch(err=>
+      Swal.fire(
+        'Failure',
+        err,
+        'error'
+      )
+      )
+    
   }
 
   deleteItem = (id)=>{
@@ -42,38 +61,55 @@ class App extends React.Component{
       reverseButtons: true
     })
     .then((result) => {
-      if(result.value){
-        const notes = [...this.state.notes].filter(note=>note.id !== id)
+        if(result.value){
+          axios.delete(`http://localhost:3010/notes/${id}`)
+        .then((response)=>{
+          Swal.fire(
+            'Deleted!',
+            'Record is Deleted',
+            'success'
+          )
+        })
+        .catch(err=>{
+          Swal.fire(
+            'Failed!',
+            err,
+            'Error'
+          )
+        })
+        const notes = [...this.state.notes].filter(note=>note._id !== id)
         this.setState({notes})
-        Swal.fire(
-          'Deleted!',
-          'Record is Deleted',
-          'success'
-        )
       }
     })
   }
     
 
   updateNote = (data) =>{
-    const notes = [...this.state.notes]
-    notes.map((note) =>{
-      if(note.id === data.id){
-        note.title = data.title
-        note.body = data.body
-      }
-      return note
+    axios.put(`http://localhost:3010/notes/${data.id}`,{title:data.title,body:data.body})
+    .then(respose=>{
+      const notes = [...this.state.notes]
+      notes.map((note) =>{
+        if(note._id === data.id){
+          note.title = data.title
+          note.body = data.body
+        }
+        return note
+      })
+      this.setState(notes)
+      Swal.fire(
+        'Updated!',
+        'Record is Updated',
+        'success'
+      )
     })
-    this.setState(notes)
-    Swal.fire(
-      'Updated!',
-      'Record is Updated',
-      'success'
-    )
-  }
-
-  searchItem = () => {
-
+    .catch(err=>{
+      Swal.fire(
+        'failed!',
+        err,
+        'Error'
+      )
+    })
+    
   }
 
 
@@ -85,9 +121,9 @@ class App extends React.Component{
         <Nav.Link onClick={() => this.setState({modalShow:true, modalType:''})} style={{color:'white',textDecoration:'none',position:'absolute',right:0,fontSize:'20px'}}><i className="fa fa-plus"></i></Nav.Link>
       </Navbar>
 
-      <Form className='searchInput'>
+      {/* <Form className='searchInput'>
         <FormControl type="text" value={this.state.searchString} onChange={(e) => this.setState({searchString:e.target.value})} placeholder="Filter by title..." className="mr-sm-2" />
-      </Form>
+      </Form> */}
 
       <CreateModal
           className='modal-content'
@@ -106,10 +142,11 @@ class App extends React.Component{
         data={{id:this.state.id,title:this.state.title,body:this.state.body}}
       ></ShowModal>
 
+
       <div style={{width:'90%',margin:'auto'}}>
         <div className='cardList'>
-          {this.state.notes.filter(note => note.title.includes(this.state.searchString)).map( content => (
-            <Card key={content.id} style={{ marginTop:'20px',width: '18rem',boxShadow:'0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',borderRadius:'0.7rem'}}>
+          {this.state.notes.map( content => (
+            <Card key={content._id} style={{ marginTop:'20px',width: '18rem',boxShadow:'0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',borderRadius:'0.7rem'}}>
               <Card.Body>
                 <Card.Title style={{display:'flex',justifyContent:'space-between'}}>
                   <div style={{height:'1.5rem',width:'75%',overflow:'hidden',textOverflow: 'ellipsis',whiteSpace:'nowrap'}}>
@@ -118,7 +155,7 @@ class App extends React.Component{
                   <span style={{fontSize:'20px',color:'grey'}}>
                     <a className='edit' href=" #" onClick={(e)=>{
                       e.preventDefault(); 
-                      this.setState({id:content.id,title:content.title,body:content.body});
+                      this.setState({id:content._id,title:content.title,body:content.body});
                       this.setState({modalType:'edit'});
                       this.setState({modalShow:true});
 
@@ -135,10 +172,10 @@ class App extends React.Component{
                   </span>
                 </Card.Text>
                 <ButtonGroup style={{float:'right'}}>
-                  <Button variant='danger' onClick={(e) =>{e.preventDefault() ; this.deleteItem(content.id)}}>Delete</Button>
+                  <Button variant='danger' onClick={(e) =>{e.preventDefault() ; this.deleteItem(content._id)}}>Delete</Button>
                   <Button variant='primary' onClick={()=>{
                     this.setState({modal2Show:true}); 
-                    this.setState({id:content.id,title:content.title,body:content.body})
+                    this.setState({id:content._id,title:content.title,body:content.body})
                     }}
                   >View</Button>
                 </ButtonGroup>

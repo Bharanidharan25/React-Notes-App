@@ -26,6 +26,7 @@ export default class CreateModal extends Component {
         this.props.updateNote({id:this.props.data.id,title:this.state.title,body:this.state.body})
         this.setState({title:'',body:''})
     }
+
     render() {
             return(
                 <Modal
