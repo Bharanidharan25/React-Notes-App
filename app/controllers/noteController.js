@@ -1,4 +1,5 @@
 const Note = require('../models/note')
+const io = require('../../index')
 
 
 module.exports.listItem = (req,res)=>{
@@ -25,9 +26,10 @@ module.exports.getItem = (req,res)=>{
 
 module.exports.postItem = (req,res)=>{
     const body = req.body
-    const note = new Note({title:body.title,body:body.body})
+    const note = new Note({title:body.title,body:body.body,color:body.color})
     note.save()
     .then((note)=>{
+        global.io.emit("added",note)
         res.json(note)
     })
     .catch(err =>{
@@ -41,6 +43,7 @@ module.exports.updateItem = (req,res)=>{
     Note.findByIdAndUpdate(id,body,{new:true})
     .then(note =>{
         if(note){
+            global.io.emit("updated",note)
             res.json(note)
         }
         else{
@@ -58,6 +61,7 @@ module.exports.deleteItem = (req,res)=>{
     Note.findByIdAndDelete(id)
     .then(note=>{
         if(note){
+            global.io.emit("deleted",note)
             res.json(note)
         }else{
             res.json({})
